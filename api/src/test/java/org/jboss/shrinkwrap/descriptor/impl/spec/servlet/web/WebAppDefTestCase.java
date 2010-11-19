@@ -82,7 +82,7 @@ public class WebAppDefTestCase
 
       ByteArrayOutputStream expected = getResourceContents("/test-web.xml");
 
-      Assert.assertEquals(expected.toString(), webApp);
+      Assert.assertEquals(stripString(expected.toString()), webApp);
    }
 
    @Test
@@ -95,7 +95,7 @@ public class WebAppDefTestCase
 
       ByteArrayOutputStream expected = getResourceContents("/test-filter-web.xml");
 
-      Assert.assertEquals(expected.toString(), webApp);
+      Assert.assertEquals(stripString(expected.toString()), webApp);
    }
 
    @Test
@@ -108,7 +108,7 @@ public class WebAppDefTestCase
 
       ByteArrayOutputStream expected = getResourceContents("/test-servlet-web.xml");
 
-      Assert.assertEquals(expected.toString(), webApp);
+      Assert.assertEquals(stripString(expected.toString()), webApp);
    }
 
    @Test
@@ -120,7 +120,7 @@ public class WebAppDefTestCase
 
       ByteArrayOutputStream expected = getResourceContents("/test-attributes-web.xml");
 
-      Assert.assertEquals(expected.toString(), webApp);
+      Assert.assertEquals(stripString(expected.toString()), webApp);
    }
 
    @Test
@@ -134,7 +134,7 @@ public class WebAppDefTestCase
 
       ByteArrayOutputStream expected = getResourceContents("/test-session-config-web.xml");
 
-      Assert.assertEquals(expected.toString(), webApp);
+      Assert.assertEquals(stripString(expected.toString()), webApp);
    }
 
    private ByteArrayOutputStream getResourceContents(String resource) throws Exception
@@ -161,4 +161,17 @@ public class WebAppDefTestCase
 
       return out;
    }
+
+  /**
+   * Removes carriage returns so we can compare the string with file contents
+   * that may have carriage returns in them
+   * 
+   * @param string
+   *            The string to be stripped
+   * @return The string without the carriage returns
+   * 
+   */
+   private String stripString(String string) {
+      return string.replace("\r","");
+   }   
 }
