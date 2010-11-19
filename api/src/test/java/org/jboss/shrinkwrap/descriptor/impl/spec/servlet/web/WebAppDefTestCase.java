@@ -16,9 +16,10 @@
  */
 package org.jboss.shrinkwrap.descriptor.impl.spec.servlet.web;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.logging.Logger;
 
 import javax.faces.application.StateManager;
@@ -28,7 +29,6 @@ import org.jboss.shrinkwrap.descriptor.api.spec.servlet.web.AuthMethodType;
 import org.jboss.shrinkwrap.descriptor.api.spec.servlet.web.HttpMethodType;
 import org.jboss.shrinkwrap.descriptor.api.spec.servlet.web.TrackingModeType;
 import org.jboss.shrinkwrap.descriptor.api.spec.servlet.web.TransportGuaranteeType;
-import org.jboss.shrinkwrap.descriptor.impl.spec.servlet.web.WebAppDescriptorImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -80,9 +80,9 @@ public class WebAppDefTestCase
 
       log.fine(webApp);
 
-      ByteArrayOutputStream expected = getResourceContents("/test-web.xml");
+      final String expected = getResourceContents("/test-web.xml");
 
-      Assert.assertEquals(stripString(expected.toString()), webApp);
+      Assert.assertEquals(expected.toString(), webApp);
    }
 
    @Test
@@ -93,9 +93,9 @@ public class WebAppDefTestCase
 
       log.fine(webApp);
 
-      ByteArrayOutputStream expected = getResourceContents("/test-filter-web.xml");
+      final String expected = getResourceContents("/test-filter-web.xml");
 
-      Assert.assertEquals(stripString(expected.toString()), webApp);
+      Assert.assertEquals(expected.toString(), webApp);
    }
 
    @Test
@@ -106,9 +106,9 @@ public class WebAppDefTestCase
 
       log.fine(webApp);
 
-      ByteArrayOutputStream expected = getResourceContents("/test-servlet-web.xml");
+      final String expected = getResourceContents("/test-servlet-web.xml");
 
-      Assert.assertEquals(stripString(expected.toString()), webApp);
+      Assert.assertEquals(expected.toString(), webApp);
    }
 
    @Test
@@ -118,9 +118,9 @@ public class WebAppDefTestCase
 
       log.fine(webApp);
 
-      ByteArrayOutputStream expected = getResourceContents("/test-attributes-web.xml");
+      final String expected = getResourceContents("/test-attributes-web.xml");
 
-      Assert.assertEquals(stripString(expected.toString()), webApp);
+      Assert.assertEquals(expected.toString(), webApp);
    }
 
    @Test
@@ -132,46 +132,23 @@ public class WebAppDefTestCase
 
       log.fine(webApp);
 
-      ByteArrayOutputStream expected = getResourceContents("/test-session-config-web.xml");
+      final String expected = getResourceContents("/test-session-config-web.xml");
 
-      Assert.assertEquals(stripString(expected.toString()), webApp);
+      Assert.assertEquals(expected.toString(), webApp);
    }
 
-   private ByteArrayOutputStream getResourceContents(String resource) throws Exception
+   private String getResourceContents(String resource) throws Exception
    {
       assert resource != null && resource.length() > 0 : "Resource must be specified";
-      final InputStream in = getClass().getResourceAsStream(resource);
-      
-      
-      int bufferSize = 1024*8;
-      final ByteArrayOutputStream out = new ByteArrayOutputStream(bufferSize * 2);
-      final byte[] buffer = new byte[bufferSize];
-      int read = 0;
-      try
-      {
-         while (((read = in.read(buffer)) != -1))
-         {
-            out.write(buffer, 0, read);
-         }
-      }
-      finally
-      {
-         in.close();
-      }
+      final Reader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(resource)));
 
-      return out;
-   }
+      final StringBuilder builder = new StringBuilder();
 
-  /**
-   * Removes carriage returns so we can compare the string with file contents
-   * that may have carriage returns in them
-   * 
-   * @param string
-   *            The string to be stripped
-   * @return The string without the carriage returns
-   * 
-   */
-   private String stripString(String string) {
-      return string.replace("\r","");
-   }   
+      for (int character = reader.read(); character > 0; character = reader.read())
+      {
+         builder.append(Character.toChars(character));
+      }
+      
+      return builder.toString();
+   } 
 }
