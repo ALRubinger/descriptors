@@ -31,6 +31,59 @@ public class WebAppDescriptorComplexTypeTestCase
     */
    
    @Test
+   public void testPrintToXml() throws Exception
+   {
+      final WebAppDescriptor webApp = create()
+            .createSecurityConstraint()
+               .createWebResourceCollection()
+                  .webResourceName("resource1")
+                  .description("descr1", "descr2", "descr3")
+                  .httpMethod("method1")
+                  .httpMethod("method2")
+               .up()
+               .createWebResourceCollection()
+                  .webResourceName("resource2")
+                  .description("descr4", "descr5", "descr6")
+                  .httpMethod("method3")
+                  .httpMethod("method4")
+               .up()
+            .up();
+              
+      String descr = webApp.getAllSecurityConstraint().get(0).getAllWebResourceCollection().get(0).toXml();
+      log.fine(descr);
+      assertPresenceUsingXPath(descr, "/web-resource-collection/web-resource-name", "resource1");
+      assertPresenceUsingXPath(descr, "/web-resource-collection/http-method[1]", "method1");
+      assertPresenceUsingXPath(descr, "/web-resource-collection/http-method[2]", "method2");
+   }
+   
+   @Test
+   public void testPrintToString() throws Exception
+   {
+      final WebAppDescriptor webApp = create()
+            .createSecurityConstraint()
+               .createWebResourceCollection()
+                  .webResourceName("resource1")
+                  .description("descr1", "descr2", "descr3")
+                  .httpMethod("method1")
+                  .httpMethod("method2")
+               .up()
+               .createWebResourceCollection()
+                  .webResourceName("resource2")
+                  .description("descr4", "descr5", "descr6")
+                  .httpMethod("method3")
+                  .httpMethod("method4")
+               .up()
+            .up();
+              
+      String descr = webApp.getAllSecurityConstraint().get(0).getAllWebResourceCollection().get(0).toString();
+      log.fine(descr);
+      assertPresenceUsingXPath(descr, "/web-resource-collection/web-resource-name", "resource1");
+      assertPresenceUsingXPath(descr, "/web-resource-collection/http-method[1]", "method1");
+      assertPresenceUsingXPath(descr, "/web-resource-collection/http-method[2]", "method2");
+   }
+   
+
+   @Test
    public void testWebResourceCollection() throws Exception
    {
       final WebAppDescriptor webApp = create()

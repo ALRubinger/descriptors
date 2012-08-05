@@ -260,7 +260,8 @@
                     <xsl:if test="position()!= last()">
                         <xsl:text>&#10;</xsl:text>
                     </xsl:if>
-                </xsl:for-each>
+                </xsl:for-each>                
+                <xsl:value-of select="xdd:printToXml('', @name, true())"/>                
                 <xsl:text>}</xsl:text>
                 <xsl:text>&#10;</xsl:text>
             </xsl:result-document>
@@ -395,7 +396,9 @@
             <xsl:result-document href="{$vFilename}">
                 <xsl:value-of select="xdd:writeCopyright()"/>
                 <xsl:value-of select="xdd:writePackageLine($vPackage)"/>
+                <xsl:text>import java.io.ByteArrayOutputStream;&#10;</xsl:text>
                 <xsl:text>import org.jboss.shrinkwrap.descriptor.spi.node.Node;&#10;</xsl:text>
+                <xsl:text>import org.jboss.shrinkwrap.descriptor.spi.node.dom.XmlDomNodeExporter;&#10;</xsl:text>
                 <xsl:value-of select="concat('import ', $pClass/@packageApi, '.', xdd:createPascalizedName($vInterfaceName,''), ';&#10;')"/>
                 <xsl:value-of select="xdd:writeImports(true())"/>
                 <xsl:value-of select="xdd:writeImports(false())"/>
@@ -429,6 +432,8 @@
                         <xsl:text>&#10;</xsl:text>
                     </xsl:if>
                 </xsl:for-each>
+                <xsl:value-of select="xdd:printToString(@name)"/>
+                <xsl:value-of select="xdd:printToXml('childNode', @name, false())"/>
                 <xsl:text>}</xsl:text>
                 <xsl:text>&#10;</xsl:text>
             </xsl:result-document>
@@ -1149,12 +1154,61 @@
         </xsl:choose>
     </xsl:function>
 
-  <!-- *********************************************************** -->
+    <!-- *********************************************************** -->
     <!-- *********************************************************** -->
     <!-- ****** Single    Elements ********************************* -->
     <!-- *********************************************************** -->
     <!-- *********************************************************** -->
 
+
+    <!-- *********************************************************** -->
+    <!-- ****** Function which writes the printCreateXX          *** -->
+    <!-- *********************************************************** -->
+    <xsl:function name="xdd:printToXml">
+        <xsl:param name="pNodeNameLocal"/>
+        <xsl:param name="pElementName"/>
+        <xsl:param name="pIsInterface" as="xs:boolean"/>
+        <xsl:value-of select="concat('', '&#10;')"/>
+        <xsl:value-of select="concat('   /**', '&#10;')"/>
+        <xsl:value-of select="concat('    * Returns an XML representation of the &lt;code&gt;', xdd:createPascalizedName($pElementName,''),'&lt;/code&gt; element &#10;')"/>
+        <xsl:value-of select="concat('    * @return ', 'formated XML string', '&#10;')"/>
+        <xsl:value-of select="concat('    */', '&#10;')"/>
+        <xsl:variable name="vStandardCreateSignature" select="concat('public String toXml','()')"/>
+
+        <xsl:choose>
+            <xsl:when test="$pIsInterface=true()">
+                <xsl:value-of select="concat('   ', $vStandardCreateSignature, ';&#10;')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="concat('   ', $vStandardCreateSignature, '&#10;')"/>
+                <xsl:value-of select="concat('   {', '&#10;')"/>                
+                <xsl:value-of select="concat('      final ByteArrayOutputStream output = new ByteArrayOutputStream();', '&#10;')"/>
+                <xsl:value-of select="concat('      XmlDomNodeExporter.INSTANCE.to(childNode, output);', '&#10;')"/>
+                <xsl:value-of select="concat('      return new String(output.toByteArray());', '&#10;')"/>
+                <xsl:value-of select="concat('   }', '&#10;')"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+    
+    
+    <!-- *********************************************************** -->
+    <!-- ****** Function which writes the printCreateXX          *** -->
+    <!-- *********************************************************** -->
+    <xsl:function name="xdd:printToString">
+        <xsl:param name="pElementName"/>
+        <xsl:value-of select="concat('', '&#10;')"/>
+        <xsl:value-of select="concat('   /**', '&#10;')"/>
+        <xsl:value-of select="concat('    * Returns an XML representation of the &lt;code&gt;', xdd:createPascalizedName($pElementName,''),'&lt;/code&gt; element &#10;')"/>
+        <xsl:value-of select="concat('    * @return ', 'formated XML string', '&#10;')"/>
+        <xsl:value-of select="concat('    */', '&#10;')"/>
+        
+        <xsl:variable name="vStandardCreateSignature" select="concat('public String toString','()')"/>
+        <xsl:value-of select="concat('   ', $vStandardCreateSignature, '&#10;')"/>
+        <xsl:value-of select="concat('   {', '&#10;')"/> 
+        <xsl:value-of select="concat('      return toXml();', '&#10;')"/>
+        <xsl:value-of select="concat('   }', '&#10;')"/>
+    </xsl:function>
+    
     <!-- *********************************************************** -->
     <!-- ****** Function which prints complex types unbounded    *** -->
     <!-- *********************************************************** -->
